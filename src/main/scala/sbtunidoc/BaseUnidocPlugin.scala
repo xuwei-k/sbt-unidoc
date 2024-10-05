@@ -1,7 +1,7 @@
 package sbtunidoc
 
 import sbt.Keys._
-import sbt._
+import sbt.{ _, given }
 import sbt.plugins.JvmPlugin
 
 /** Provides default settings for unidoc plugins.

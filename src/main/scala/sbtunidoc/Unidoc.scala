@@ -1,6 +1,6 @@
 package sbtunidoc
 
-import sbt._
+import sbt.{ _, given }
 import sbt.Keys._
 import sbt.internal.inc.{AnalyzingCompiler, ManagedLoggedReporter}
 import sbt.internal.util.Attributed.data

@@ -1,6 +1,6 @@
 package sbtunidoc
 
-import sbt._
+import sbt.{ _, given }
 import Keys._
 import BaseUnidocPlugin.autoImport._
 

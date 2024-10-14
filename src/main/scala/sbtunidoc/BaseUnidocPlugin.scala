@@ -1,7 +1,7 @@
 package sbtunidoc
 
 import sbt.Keys._
-import sbt._
+import sbt.{ _, given }
 import sbt.plugins.JvmPlugin
 
 /** Provides default settings for unidoc plugins.
@@ -20,14 +20,17 @@ object BaseUnidocPlugin extends AutoPlugin {
   override def requires = JvmPlugin
 
   def baseUnidocSettings(sc: Configuration): Seq[sbt.Def.Setting[_]] = Seq(
-    doc := Unidoc(streams.value.cacheDirectory, (unidoc / compilers).value, (unidoc / sources).value, (unidoc / fullClasspath).value,
-      (unidoc / scalacOptions).value, (unidoc / javacOptions).value, (unidoc / apiMappings).value, (unidoc / maxErrors).value,
-      (unidoc / target).value, configuration.value, streams.value, (unidoc / sourcePositionMappers).value, fileConverter.value),
+    doc := {
+      val converter = fileConverter.value
+      Unidoc(streams.value.cacheDirectory, (unidoc / compilers).value, (unidoc / sources).value, (unidoc / fullClasspath).value,
+      (unidoc / scalacOptions).value, (unidoc / javacOptions).value, (unidoc / apiMappings).value.map{ case (k, v) => converter.toPath(k).toFile -> v }, (unidoc / maxErrors).value,
+      (unidoc / target).value, configuration.value, streams.value, (unidoc / sourcePositionMappers).value, converter)
+    },
     unidoc / compilers := (sc / compilers).value,
     unidoc / sources := (unidoc / unidocAllSources).value.flatten.sortBy { _.getAbsolutePath },
     unidoc / scalacOptions := (sc / doc / scalacOptions).value,
     unidoc / javacOptions := (sc / doc / javacOptions).value,
-    unidoc / fullClasspath := (unidoc / unidocAllClasspaths).value.flatten.distinct.sortBy { _.data.getName },
+    unidoc / fullClasspath := (unidoc / unidocAllClasspaths).value.flatten.distinct.sortBy { _.data.name },
     unidoc / unidocAllClasspaths := allClasspathsTask.value,
     unidoc / apiMappings := {
       val all = (unidoc / unidocAllAPIMappings).value

@@ -1,8 +1,17 @@
-ThisBuild / scalaVersion := "2.12.17"
 ThisBuild / version := {
   val orig = (ThisBuild / version).value
   if (orig.endsWith("-SNAPSHOT")) "0.5.0-SNAPSHOT"
   else orig
+}
+
+
+crossScalaVersions += "3.3.4"
+
+pluginCrossBuild / sbtVersion := {
+  scalaBinaryVersion.value match {
+    case "2.12" => sbtVersion.value
+    case _ => "2.0.0-M2"
+  }
 }
 
 lazy val root = (project in file("."))
@@ -11,8 +20,6 @@ lazy val root = (project in file("."))
     name := "sbt-unidoc",
     scriptedLaunchOpts ++= Seq("-Xmx1024M", "-Dplugin.version=" + version.value),
     scriptedBufferLog := false,
-    // sbt-unidoc requires sbt 1.5.0 and up
-    pluginCrossBuild / sbtVersion := "1.5.0",
   )
 
 Global / onChangedBuildSource := ReloadOnSourceChanges
